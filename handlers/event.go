@@ -27,15 +27,30 @@ func EventMessage(event slackevents.EventsAPIEvent, client *slack.Client) error 
 }
 
 func appMentionEvent(event *slackevents.AppMentionEvent, client *slack.Client) error {
+	channelID := os.Getenv("SLACK_CHANNEL_ID")
 	_, err := client.GetUserInfo(event.User)
 	if err != nil {
 		return err
 	}
 
-	attachment := slack.Attachment{}
-	attachment.Pretext = "Digest added"
+	threadTs := event.ThreadTimeStamp
+	if threadTs == "" {
+		attachment := slack.Attachment{}
+		attachment.Pretext = "Please mention me in a thread to get a daily digest."
+		_, _, err = client.PostMessage(event.Channel, slack.MsgOptionAttachments(attachment))
+		if err != nil {
+			return errors.New("failed to post message")
+		}
+		return nil
+	}
+	link, err := client.GetPermalink(&slack.PermalinkParameters{Channel: event.Channel, Ts: event.ThreadTimeStamp})
+	if err != nil {
+		return err
+	}
 
-	channelID := os.Getenv("SLACK_CHANNEL_ID")
+	attachment := slack.Attachment{}
+	attachment.Pretext = link
+
 	_, _, err = client.PostMessage(channelID, slack.MsgOptionAttachments(attachment))
 	if err != nil {
 		return errors.New("failed to post message")
