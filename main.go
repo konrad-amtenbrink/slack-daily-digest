@@ -44,7 +44,7 @@ func main() {
 						continue
 					}
 					socketClient.Ack(*event.Request)
-					err := handlers.EventMessage(eventsAPIEvent, client)
+					err := handlers.OnMessage(eventsAPIEvent, client)
 					if err != nil {
 						log.Printf("Error: %v\n", err)
 					}
