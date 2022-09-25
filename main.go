@@ -7,6 +7,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/konrad-amtenbrink/slack-daily-digest/handlers"
+	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/cron"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -49,6 +50,17 @@ func main() {
 					err := handlers.OnMessage(eventsAPIEvent, client)
 					if err != nil {
 						log.Printf("Error: %v\n", err)
+					}
+				case socketmode.EventTypeSlashCommand:
+					command, succ := event.Data.(slack.SlashCommand)
+					if !succ {
+						log.Printf("Could not type cast the message to a SlashCommand: %v\n", command)
+						continue
+					}
+					socketClient.Ack(*event.Request)
+					err := _slack.HandleSlashCommand(command, client)
+					if err != nil {
+						log.Print(err)
 					}
 				}
 

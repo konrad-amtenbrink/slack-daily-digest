@@ -12,18 +12,26 @@ func Init(client *slack.Client) {
 	c := cron.New(cron.WithParser(cron.NewParser(
 		cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor,
 	)))
-	c.AddFunc("0 0 * * * ", func() { publishUpdate(client) })
+	c.AddFunc("0 0 * * * ", func() { handleCron(client) })
 	c.Start()
 }
 
-func publishUpdate(client *slack.Client) {
+func handleCron(client *slack.Client) {
+	err := publishUpdate(client)
+	if err != nil {
+		log.Print(err)
+	}
+}
+
+func publishUpdate(client *slack.Client) error {
 	msg, err := _slack.CreateMessage([]_slack.Thread{{Title: "Daily Digest send from cron job"}})
 	if err != nil {
-		log.Default().Print(err)
+		return err
 	}
 
 	err = _slack.PostMessage(msg, client)
 	if err != nil {
-		log.Default().Print(err)
+		return err
 	}
+	return nil
 }
