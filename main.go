@@ -21,7 +21,9 @@ func main() {
 
 	client := slack.New(token, slack.OptionDebug(true), slack.OptionAppLevelToken(appToken))
 
-	cron.Init(client)
+	go func() {
+		cron.Init(client)
+	}()
 
 	socketClient := socketmode.New(
 		client,

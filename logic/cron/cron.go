@@ -2,18 +2,22 @@ package cron
 
 import (
 	"log"
+	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
-	"github.com/robfig/cron/v3"
 	"github.com/slack-go/slack"
 )
 
 func Init(client *slack.Client) {
-	c := cron.New(cron.WithParser(cron.NewParser(
-		cron.SecondOptional | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor,
-	)))
-	c.AddFunc("0 0 * * * ", func() { handleCron(client) })
-	c.Start()
+	s := gocron.NewScheduler(time.UTC)
+
+	// 6pm Europe/Berlin
+	s.Every(1).Day().Tag("tag").At("16:00").Do(func() {
+		handleCron(client)
+	})
+
+	s.StartBlocking()
 }
 
 func handleCron(client *slack.Client) {
