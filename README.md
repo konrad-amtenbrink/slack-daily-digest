@@ -1,20 +1,19 @@
-- [Golang Template Project](#golang-template-project)
-  - [About the project](#about-the-project)
-    - [Status](#status)
+
+- [Slack Daily Digest](#slack-daily-digest)
+  - [Status](#status)
   - [Getting started](#getting-started)
     - [Layout](#layout)
+    - [Environment](#environment-variables)
   - [How to run](#how-to-run)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Slack Daily Digest
 
-## About the project
-
 This Project solves the issue of missing out on important threads in slack 
-channels. You get daily digests of the channels you subcribed to.
+channels. You get daily digests of all the important threads of the channels you subcribed to.
 
-### Status
+## Status
 
 The template project is in development status.
 
@@ -47,6 +46,9 @@ Below we describe the conventions or tools specific to Slack Daily Digest.
 ┣ 📜go.sum
 ┗ 📜main.go
 ```
+
+### Environment
+Please see [.env.example](https://github.com/konrad-amtenbrink/slack-daily-digest/blob/main/.env.example)
 
 ## How to run
 ### First, install [air](https://github.com/cosmtrek/air) via
