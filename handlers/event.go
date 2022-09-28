@@ -1,21 +1,24 @@
 package handlers
 
 import (
+	"database/sql"
 	"errors"
+	"os"
 
+	dbClient "github.com/konrad-amtenbrink/slack-daily-digest/db"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 )
 
-func OnMessage(event slackevents.EventsAPIEvent, client *slack.Client) error {
+func OnMessage(event slackevents.EventsAPIEvent, client *slack.Client, db *sql.DB) error {
 	switch event.Type {
 	case slackevents.CallbackEvent:
 
 		innerEvent := event.InnerEvent
 		switch ev := innerEvent.Data.(type) {
 		case *slackevents.AppMentionEvent:
-			err := onMention(ev, client)
+			err := onMention(ev, client, db)
 			if err != nil {
 				return err
 			}
@@ -26,7 +29,7 @@ func OnMessage(event slackevents.EventsAPIEvent, client *slack.Client) error {
 	return nil
 }
 
-func onMention(event *slackevents.AppMentionEvent, client *slack.Client) error {
+func onMention(event *slackevents.AppMentionEvent, client *slack.Client, db *sql.DB) error {
 	_, err := client.GetUserInfo(event.User)
 	if err != nil {
 		return err
@@ -45,11 +48,24 @@ func onMention(event *slackevents.AppMentionEvent, client *slack.Client) error {
 		return err
 	}
 
-	msg, err := _slack.CreateMessage([]_slack.Thread{{Link: link, Title: "Daily Digest"}})
+	thread := _slack.Thread{Link: link, Title: "Daily Digest"}
+	err = dbClient.AddThread(db, thread)
 	if err != nil {
 		return err
 	}
 
-	err = _slack.PostMessage(msg, client)
-	return err
+	environment := os.Getenv("ENVIRONMENT")
+	if environment == "development" {
+		msg, err := _slack.CreateMessage([]_slack.Thread{thread})
+		if err != nil {
+			return err
+		}
+
+		err = _slack.PostMessage(msg, client)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

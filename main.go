@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/joho/godotenv"
+	dbClient "github.com/konrad-amtenbrink/slack-daily-digest/db"
 	"github.com/konrad-amtenbrink/slack-daily-digest/handlers"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/cron"
@@ -21,15 +22,28 @@ func main() {
 
 	client := slack.New(token, slack.OptionDebug(true), slack.OptionAppLevelToken(appToken))
 
-	go func() {
-		cron.Init(client)
-	}()
+	db, err := dbClient.Init()
+	if err != nil {
+		log.Printf("DB Connection Error: %v", err)
+	}
+	defer db.Close()
 
-	socketClient := socketmode.New(
-		client,
-		socketmode.OptionDebug(true),
-		socketmode.OptionLog(log.New(os.Stdout, "socketmode: ", log.Lshortfile|log.LstdFlags)),
-	)
+	environment := os.Getenv("ENVIRONMENT")
+	var socketClient *socketmode.Client
+	if environment == "production" {
+		go func() {
+			cron.Init(client)
+		}()
+		socketClient = socketmode.New(
+			client,
+		)
+	} else {
+		socketClient = socketmode.New(
+			client,
+			socketmode.OptionDebug(true),
+			socketmode.OptionLog(log.New(os.Stdout, "socketmode: ", log.Lshortfile|log.LstdFlags)),
+		)
+	}
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -49,7 +63,7 @@ func main() {
 						continue
 					}
 					socketClient.Ack(*event.Request)
-					err := handlers.OnMessage(eventsAPIEvent, client)
+					err := handlers.OnMessage(eventsAPIEvent, client, db)
 					if err != nil {
 						log.Printf("Error: %v\n", err)
 					}
