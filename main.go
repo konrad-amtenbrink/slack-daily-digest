@@ -31,7 +31,7 @@ func main() {
 	var socketClient *socketmode.Client
 	if environment == "production" {
 		go func() {
-			cron.Init(client)
+			cron.Init(client, db)
 		}()
 		socketClient = socketmode.New(
 			client,
@@ -73,7 +73,7 @@ func main() {
 						continue
 					}
 					socketClient.Ack(*event.Request)
-					err := handlers.HandleSlashCommand(command, client)
+					err := handlers.HandleSlashCommand(command, client, db)
 					if err != nil {
 						log.Print(err)
 					}

@@ -4,15 +4,11 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/konrad-amtenbrink/slack-daily-digest/models"
 	"github.com/slack-go/slack"
 )
 
-type Thread struct {
-	Title string
-	Link  string
-}
-
-func CreateMessage(threads []Thread) (slack.MsgOption, error) {
+func CreateMessage(threads []models.Thread) (slack.MsgOption, error) {
 	messageBlocks, err := createMessageBlocks()
 	if err != nil {
 		return nil, err
@@ -53,7 +49,7 @@ func createMessageBlocks() ([]slack.Block, error) {
 	return blocks.BlockSet, nil
 }
 
-func createThreadBlocks(threads []Thread) ([]slack.Block, error) {
+func createThreadBlocks(threads []models.Thread) ([]slack.Block, error) {
 	result := []slack.Block{}
 	for _, thread := range threads {
 		threadBlock := slack.SectionBlock{
@@ -72,7 +68,7 @@ func createThreadBlocks(threads []Thread) ([]slack.Block, error) {
 					},
 					Value:    "view_thread",
 					ActionID: "button-action",
-					URL:      thread.Link,
+					URL:      thread.Url,
 				},
 			},
 		}

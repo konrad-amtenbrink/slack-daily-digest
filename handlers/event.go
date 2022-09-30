@@ -7,6 +7,7 @@ import (
 
 	dbClient "github.com/konrad-amtenbrink/slack-daily-digest/db"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
+	"github.com/konrad-amtenbrink/slack-daily-digest/models"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
 )
@@ -48,7 +49,7 @@ func onMention(event *slackevents.AppMentionEvent, client *slack.Client, db *sql
 		return err
 	}
 
-	thread := _slack.Thread{Link: link, Title: "Daily Digest"}
+	thread := models.Thread{Url: link, Title: "Daily Digest"}
 	err = dbClient.AddThread(db, thread)
 	if err != nil {
 		return err
@@ -56,7 +57,7 @@ func onMention(event *slackevents.AppMentionEvent, client *slack.Client, db *sql
 
 	environment := os.Getenv("ENVIRONMENT")
 	if environment == "development" {
-		msg, err := _slack.CreateMessage([]_slack.Thread{thread})
+		msg, err := _slack.CreateMessage([]models.Thread{thread})
 		if err != nil {
 			return err
 		}
