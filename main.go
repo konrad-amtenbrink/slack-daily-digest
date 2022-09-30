@@ -8,7 +8,6 @@ import (
 	"github.com/joho/godotenv"
 	dbClient "github.com/konrad-amtenbrink/slack-daily-digest/db"
 	"github.com/konrad-amtenbrink/slack-daily-digest/handlers"
-	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
 	"github.com/konrad-amtenbrink/slack-daily-digest/logic/cron"
 	"github.com/slack-go/slack"
 	"github.com/slack-go/slack/slackevents"
@@ -74,7 +73,7 @@ func main() {
 						continue
 					}
 					socketClient.Ack(*event.Request)
-					err := _slack.HandleSlashCommand(command, client)
+					err := handlers.HandleSlashCommand(command, client)
 					if err != nil {
 						log.Print(err)
 					}

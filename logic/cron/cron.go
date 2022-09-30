@@ -34,8 +34,5 @@ func publishUpdate(client *slack.Client) error {
 	}
 
 	err = _slack.PostMessage(msg, client)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }

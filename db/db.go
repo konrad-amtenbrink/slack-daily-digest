@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/konrad-amtenbrink/slack-daily-digest/logic/_slack"
 	_ "github.com/lib/pq"
 )
 
@@ -37,20 +36,6 @@ func Init() (*sql.DB, error) {
 	}
 	log.Printf("Successfully connected to DB")
 	return db, nil
-}
-
-func GetThreads() []_slack.Thread {
-	return nil
-}
-
-func AddThread(db *sql.DB, thread _slack.Thread) error {
-	sqlStatement := fmt.Sprintf("INSERT INTO thread (title, url) VALUES ('%s', '%s')",
-		thread.Title, thread.Link)
-	_, err := db.Exec(sqlStatement)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func getDBConfig() DBConfig {
