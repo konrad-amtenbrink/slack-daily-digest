@@ -10,7 +10,7 @@
 			"type": "context",
 			"elements": [
 				{
-					"text": "*November 12, 2019*  |  Development Announcements",
+					"text": "Development Announcements",
 					"type": "mrkdwn"
 				}
 			]
@@ -33,7 +33,7 @@
 			"elements": [
 				{
 					"type": "mrkdwn",
-					"text": ":pushpin: Do you have something to include in the newsletter? Here's *how to submit content*."
+					"text": ":pushpin: Do you have something to include in the newsletter? Just mention *me* in a thread and it gets included in the next digest."
 				}
 			]
 		}

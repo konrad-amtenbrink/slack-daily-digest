@@ -8,7 +8,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-func CreateMessage(threads []models.Thread) (slack.MsgOption, error) {
+func CreateDigestMessage(threads []models.Thread) (slack.MsgOption, error) {
 	messageBlocks, err := createMessageBlocks()
 	if err != nil {
 		return nil, err
@@ -19,17 +19,14 @@ func CreateMessage(threads []models.Thread) (slack.MsgOption, error) {
 		return nil, err
 	}
 	msg := append(messageBlocks[:3], threadBlocks...)
-	msg = append(msg, messageBlocks[3+len(threadBlocks):]...)
+	msg = append(msg, messageBlocks[3:]...)
 	return slack.MsgOptionBlocks(msg...), nil
 }
 
-func PostMessage(msg slack.MsgOption, client *slack.Client) error {
-	channelID := os.Getenv("SLACK_CHANNEL_ID")
-	_, _, err := client.PostMessage(channelID, msg)
-	if err != nil {
-		return err
-	}
-	return nil
+func CreateErrorMessage() slack.MsgOption {
+	attachment := slack.Attachment{}
+	attachment.Pretext = "Please mention me in a thread to add to the daily digest."
+	return slack.MsgOptionAttachments(attachment)
 }
 
 func createMessageBlocks() ([]slack.Block, error) {

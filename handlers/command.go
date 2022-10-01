@@ -10,7 +10,7 @@ import (
 	"github.com/slack-go/slack"
 )
 
-func HandleSlashCommand(command slack.SlashCommand, client *slack.Client, db *sql.DB) error {
+func HandleCommand(command slack.SlashCommand, client *slack.Client, db *sql.DB) error {
 	switch command.Command {
 	case "/digest":
 		return handleDigestCommand(command, client, db)
@@ -35,5 +35,5 @@ func handleDigestCommand(command slack.SlashCommand, client *slack.Client, db *s
 	if err != nil {
 		return err
 	}
-	return _slack.PrepareDigest(users, threads, client)
+	return _slack.HandleDigest(users, threads, client)
 }

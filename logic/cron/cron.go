@@ -38,5 +38,5 @@ func publishUpdate(client *slack.Client, db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-	return _slack.PrepareDigest(users, threads, client)
+	return _slack.HandleDigest(users, threads, client)
 }
