@@ -45,7 +45,12 @@ func onMention(event *slackevents.AppMentionEvent, client *slack.Client, db *sql
 		return err
 	}
 
-	thread := models.Thread{Url: url, Title: "Daily Digest"}
+	replies, _, _, err := client.GetConversationReplies(&slack.GetConversationRepliesParameters{ChannelID: event.Channel, Timestamp: event.ThreadTimeStamp})
+	if err != nil {
+		return err
+	}
+
+	thread := models.Thread{Url: url, Title: replies[0].Msg.Text}
 
 	return dbClient.AddThread(db, thread)
 }
