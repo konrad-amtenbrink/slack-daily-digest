@@ -18,8 +18,12 @@ func CreateDigestMessage(threads []models.Thread) (slack.MsgOption, error) {
 	if err != nil {
 		return nil, err
 	}
-	msg := append(messageBlocks[:3], threadBlocks...)
-	msg = append(msg, messageBlocks[3:]...)
+
+	msg := make([]slack.Block, len(messageBlocks)+len(threadBlocks))
+	copy(msg, messageBlocks[:4])
+	copy(msg[4:], threadBlocks)
+	copy(msg[4+len(threadBlocks):], messageBlocks[4:])
+
 	return slack.MsgOptionBlocks(msg...), nil
 }
 
