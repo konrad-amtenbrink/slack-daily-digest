@@ -1,18 +1,12 @@
 package _slack
 
 import (
-	"io/ioutil"
-	"os"
-
 	"github.com/konrad-amtenbrink/slack-daily-digest/models"
 	"github.com/slack-go/slack"
 )
 
 func CreateDigestMessage(threads []models.Thread) (slack.MsgOption, error) {
-	messageBlocks, err := createMessageBlocks()
-	if err != nil {
-		return nil, err
-	}
+	messageBlocks := createMessageBlocks()
 
 	threadBlocks, err := createThreadBlocks(threads)
 	if err != nil {
@@ -20,9 +14,11 @@ func CreateDigestMessage(threads []models.Thread) (slack.MsgOption, error) {
 	}
 
 	msg := make([]slack.Block, len(messageBlocks)+len(threadBlocks))
-	copy(msg, messageBlocks[:4])
-	copy(msg[4:], threadBlocks)
-	copy(msg[4+len(threadBlocks):], messageBlocks[4:])
+	copy(msg, messageBlocks)
+	copy(msg[len(messageBlocks):], threadBlocks)
+
+	footer := getFooter()
+	msg = append(msg, &footer)
 
 	return slack.MsgOptionBlocks(msg...), nil
 }
@@ -33,21 +29,22 @@ func CreateErrorMessage() slack.MsgOption {
 	return slack.MsgOptionAttachments(attachment)
 }
 
-func createMessageBlocks() ([]slack.Block, error) {
-	jsonFile, err := os.Open("./templates/message.json")
-	if err != nil {
-		return nil, err
-	}
+func createMessageBlocks() []slack.Block {
+	result := []slack.Block{}
 
-	defer jsonFile.Close()
+	header := getHeader()
+	result = append(result, &header)
 
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-	blocks := slack.Blocks{}
-	blocks.UnmarshalJSON(byteValue)
-	return blocks.BlockSet, nil
+	context := getContext()
+	result = append(result, &context)
+
+	divider := getDivider()
+	result = append(result, &divider)
+
+	mainSection := getMainSection()
+	result = append(result, &mainSection)
+
+	return result
 }
 
 func createThreadBlocks(threads []models.Thread) ([]slack.Block, error) {
