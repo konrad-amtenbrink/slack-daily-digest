@@ -11,8 +11,10 @@
 [![Go Test](https://github.com/konrad-amtenbrink/slack-daily-digest/actions/workflows/go.yml/badge.svg?branch=main)](https://github.com/konrad-amtenbrink/slack-daily-digest/actions/workflows/go.yml)
 # Slack Daily Digest
 
-This Project solves the issue of missing out on important threads in slack 
+This project solves the issue of missing out on important threads in slack 
 channels.
+
+> :warning: **FYI**: Even though slack daily digest is basically finished, I never deployed it. I just used this project to learn the basics of go.
 
 [Getting started](#getting-started) •
 [Installation](#installation) •
